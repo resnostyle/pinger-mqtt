@@ -23,13 +23,13 @@ Assistant MQTT discovery creates latency and reachability sensors per device.
 
 All messages are retained JSON.
 
-Example `home/ping/living_speaker/current`:
+Example `home/ping/example_speaker/current`:
 
 ```json
 {
-  "entity_id": "media_player.living_speaker",
-  "friendly_name": "Living speaker",
-  "host": "192.168.2.45",
+  "entity_id": "media_player.example_speaker",
+  "friendly_name": "Example speaker",
+  "host": "192.0.2.10",
   "reachable": true,
   "latency_ms": 12.4,
   "method": "tcp8008",
@@ -105,7 +105,7 @@ See [`.env.example`](.env.example). Required: `HA_URL`, `HA_TOKEN`.
 | `PING_STATS_WINDOW` | `60` | Rolling window size |
 | `PING_MANUFACTURER_FILTER` | `Google Inc.` | Comma-separated allowlist |
 | `PING_EXCLUDE_MODELS` | `Google Cast Group` | Skip virtual groups |
-| `PING_HOST_OVERRIDES` | *(empty)* | Manual `entity_id:host` map |
+| `PING_HOST_OVERRIDES` | *(empty)* | Manual `entity_id:host` map (e.g. `media_player.example_speaker:192.0.2.10`) |
 
 ## Tracking connection quality over time
 

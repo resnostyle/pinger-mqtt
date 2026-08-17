@@ -3,46 +3,50 @@
 from src.config import Settings
 from src.ha import HomeAssistantClient
 
+TEST_CAST_UUID = "11111111-2222-3333-4444-555555555555"
+TEST_CAST_GROUP_UUID = "22222222-3333-4444-5555-666666666666"
+TEST_TV_CAST_UUID = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+TEST_DISABLED_CAST_UUID = "bbbbbbbb-cccc-dddd-eeee-ffffffffffff"
 
 ENTITY_REGISTRY = [
     {
-        "entity_id": "media_player.living_speaker",
+        "entity_id": "media_player.example_speaker",
         "platform": "cast",
         "device_id": "dev1",
         "disabled_by": None,
         "hidden_by": None,
         "name": None,
-        "original_name": "Living speaker",
+        "original_name": "Example speaker",
         "area_id": None,
     },
     {
-        "entity_id": "media_player.living_speaker_2",
+        "entity_id": "media_player.example_speaker_2",
         "platform": "cast",
         "device_id": "dev1",
         "disabled_by": None,
         "hidden_by": None,
         "name": None,
-        "original_name": "Living speaker",
+        "original_name": "Example speaker",
         "area_id": None,
     },
     {
-        "entity_id": "media_player.everything",
+        "entity_id": "media_player.cast_group",
         "platform": "cast",
         "device_id": "dev2",
         "disabled_by": None,
         "hidden_by": None,
         "name": None,
-        "original_name": "everything",
+        "original_name": "Example group",
         "area_id": None,
     },
     {
-        "entity_id": "media_player.shield_tv",
+        "entity_id": "media_player.example_tv",
         "platform": "cast",
         "device_id": "dev3",
         "disabled_by": None,
         "hidden_by": None,
         "name": None,
-        "original_name": "Living Room TV",
+        "original_name": "Example TV",
         "area_id": None,
     },
     {
@@ -60,26 +64,26 @@ ENTITY_REGISTRY = [
 DEVICE_REGISTRY = [
     {
         "id": "dev1",
-        "name": "Living speaker",
+        "name": "Example speaker",
         "manufacturer": "Google Inc.",
         "model": "Google Home",
-        "identifiers": [["cast", "f9686391-4fa1-e713-ae01-efcb082fef87"]],
+        "identifiers": [["cast", TEST_CAST_UUID]],
         "area_id": None,
     },
     {
         "id": "dev2",
-        "name": "everything",
+        "name": "Example group",
         "manufacturer": "Google Inc.",
         "model": "Google Cast Group",
-        "identifiers": [["cast", "f20e4562-80d7-4765-9c39-54555d5a9ef9"]],
+        "identifiers": [["cast", TEST_CAST_GROUP_UUID]],
         "area_id": None,
     },
     {
         "id": "dev3",
-        "name": "Living Room TV",
-        "manufacturer": "NVIDIA",
-        "model": "SHIELD Android TV",
-        "identifiers": [["cast", "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"]],
+        "name": "Example TV",
+        "manufacturer": "Example Corp",
+        "model": "Example Streamer",
+        "identifiers": [["cast", TEST_TV_CAST_UUID]],
         "area_id": None,
     },
     {
@@ -87,7 +91,7 @@ DEVICE_REGISTRY = [
         "name": "Disabled",
         "manufacturer": "Google Inc.",
         "model": "Google Home Mini",
-        "identifiers": [["cast", "11111111-2222-3333-4444-555555555555"]],
+        "identifiers": [["cast", TEST_DISABLED_CAST_UUID]],
         "area_id": None,
     },
 ]
@@ -103,7 +107,7 @@ class FakeHA(HomeAssistantClient):
 
 def test_discover_cast_targets_filters_and_dedupes(monkeypatch):
     settings = Settings(
-        ha_url="http://ha.local",
+        ha_url="http://ha.example.test",
         ha_token="token",
         mqtt_host="127.0.0.1",
         mqtt_port=1883,
@@ -124,8 +128,8 @@ def test_discover_cast_targets_filters_and_dedupes(monkeypatch):
         ping_host_overrides={},
         log_level="INFO",
     )
-    ha = FakeHA("http://ha.local", "token")
+    ha = FakeHA("http://ha.example.test", "token")
     targets = ha.discover_cast_targets(settings)
     assert len(targets) == 1
-    assert targets[0].entity_id == "media_player.living_speaker"
-    assert targets[0].cast_uuid == "f9686391-4fa1-e713-ae01-efcb082fef87"
+    assert targets[0].entity_id == "media_player.example_speaker"
+    assert targets[0].cast_uuid == TEST_CAST_UUID

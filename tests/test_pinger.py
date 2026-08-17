@@ -6,10 +6,13 @@ from unittest.mock import patch
 from src.config import PingTarget, Settings
 from src.pinger import Pinger, ProbeResult, probe_tcp
 
+TEST_HOST = "192.0.2.10"
+TEST_CAST_UUID = "11111111-2222-3333-4444-555555555555"
+
 
 def _settings(**kwargs) -> Settings:
     defaults = {
-        "ha_url": "http://ha.local",
+        "ha_url": "http://ha.example.test",
         "ha_token": "token",
         "mqtt_host": "127.0.0.1",
         "mqtt_port": 1883,
@@ -34,13 +37,13 @@ def _settings(**kwargs) -> Settings:
     return Settings(**defaults)
 
 
-def _target(host: str | None = "192.168.2.45") -> PingTarget:
+def _target(host: str | None = TEST_HOST) -> PingTarget:
     return PingTarget(
-        entity_id="media_player.living_speaker",
+        entity_id="media_player.example_speaker",
         device_id="dev1",
-        slug="living_speaker",
-        friendly_name="Living speaker",
-        cast_uuid="f9686391-4fa1-e713-ae01-efcb082fef87",
+        slug="example_speaker",
+        friendly_name="Example speaker",
+        cast_uuid=TEST_CAST_UUID,
         manufacturer="Google Inc.",
         model="Google Home",
         area_id=None,
@@ -52,7 +55,7 @@ def test_probe_tcp_success():
     with patch("src.pinger.socket.create_connection") as mock_connect:
         mock_connect.return_value.__enter__ = lambda s: s
         mock_connect.return_value.__exit__ = lambda s, *a: None
-        result = probe_tcp("192.168.2.45", 8008, 2000)
+        result = probe_tcp(TEST_HOST, 8008, 2000)
     assert result.reachable is True
     assert result.latency_ms is not None
     assert result.error is None
@@ -60,7 +63,7 @@ def test_probe_tcp_success():
 
 def test_probe_tcp_timeout():
     with patch("src.pinger.socket.create_connection", side_effect=socket.timeout):
-        result = probe_tcp("192.168.2.45", 8008, 2000)
+        result = probe_tcp(TEST_HOST, 8008, 2000)
     assert result.reachable is False
     assert result.error == "timeout"
 
