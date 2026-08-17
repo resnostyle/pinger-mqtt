@@ -1,0 +1,12 @@
+# Example sidecar next to Home Assistant / Mosquitto.
+# Copy env from .env.example and point image at your build or registry.
+
+services:
+  pinger-mqtt:
+    image: ghcr.io/resnostyle/pinger-mqtt:latest
+    # build: .   # local override
+    container_name: pinger-mqtt
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
