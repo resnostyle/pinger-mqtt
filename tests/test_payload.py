@@ -4,18 +4,22 @@ from src.config import PingTarget
 from src.payload import build_device_payload, build_summary_payload
 from src.pinger import ProbeResult, ProbeStats
 
+TEST_HOST = "192.0.2.10"
+TEST_HOST_OTHER = "192.0.2.20"
+TEST_CAST_UUID = "11111111-2222-3333-4444-555555555555"
+
 
 def _target(**kwargs) -> PingTarget:
     defaults = {
-        "entity_id": "media_player.living_speaker",
+        "entity_id": "media_player.example_speaker",
         "device_id": "abc123",
-        "slug": "living_speaker",
-        "friendly_name": "Living speaker",
-        "cast_uuid": "f9686391-4fa1-e713-ae01-efcb082fef87",
+        "slug": "example_speaker",
+        "friendly_name": "Example speaker",
+        "cast_uuid": TEST_CAST_UUID,
         "manufacturer": "Google Inc.",
         "model": "Google Home",
         "area_id": None,
-        "host": "192.168.2.45",
+        "host": TEST_HOST,
     }
     defaults.update(kwargs)
     return PingTarget(**defaults)
@@ -33,7 +37,7 @@ def test_build_device_payload():
         last_success_at="2026-08-17T22:30:00+00:00",
     )
     payload = build_device_payload(target, result, stats, method="tcp8008")
-    assert payload["entity_id"] == "media_player.living_speaker"
+    assert payload["entity_id"] == "media_player.example_speaker"
     assert payload["reachable"] is True
     assert payload["latency_ms"] == 12.4
     assert payload["method"] == "tcp8008"
@@ -50,7 +54,7 @@ def test_build_summary_payload():
     summary = build_summary_payload(
         [
             (target, ok, stats_ok),
-            (target.with_host("192.168.2.46"), fail, stats_fail),
+            (target.with_host(TEST_HOST_OTHER), fail, stats_fail),
         ],
         method="tcp8008",
     )

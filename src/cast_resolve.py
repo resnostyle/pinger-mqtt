@@ -42,6 +42,7 @@ def parse_cast_service(
     name: str,
     host: str,
     properties: dict[str, Any] | None,
+    addresses: list[str] | None = None,
 ) -> tuple[str, str] | None:
     """Return (uuid, host_ip) from an mDNS service record."""
     props = properties or {}
@@ -56,7 +57,14 @@ def parse_cast_service(
             return None
         uuid = parsed
 
-    host_ip = socket.gethostbyname(host.rstrip("."))
+    if addresses:
+        host_ip = addresses[0]
+    else:
+        try:
+            host_ip = socket.gethostbyname(host.rstrip("."))
+        except socket.gaierror:
+            logger.debug("Could not resolve mDNS host %s for %s", host, name)
+            return None
     return uuid, host_ip
 
 
@@ -87,7 +95,9 @@ class CastResolver:
             host = info.server or ""
             if not host:
                 return
-            parsed = parse_cast_service(name, host, info.properties)
+            parsed = parse_cast_service(
+                name, host, info.properties, info.parsed_addresses()
+            )
             if parsed:
                 uuid, host_ip = parsed
                 found[uuid] = host_ip
