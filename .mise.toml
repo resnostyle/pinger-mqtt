@@ -1,0 +1,50 @@
+# https://mise.jdx.dev/
+# First-time: mise trust && mise run setup
+
+[tools]
+python = "3.12"
+
+[env]
+_.file = ".env"
+PYTHONPATH = "."
+
+[tasks.help]
+description = "Show available automation tasks"
+run = "mise tasks"
+
+[tasks.setup]
+description = "Create .env if missing and install dependencies"
+run = """
+if [ ! -f .env ]; then cp .env.example .env && echo "Created .env from .env.example"; fi
+pip install -r requirements.txt pytest
+"""
+
+[tasks.test]
+description = "Run unit tests"
+depends = ["setup"]
+run = "pytest -q"
+
+[tasks.ci]
+description = "Run CI checks locally (same as GitHub Actions test job)"
+depends = ["test"]
+
+[tasks.run]
+description = "Run pinger-mqtt service"
+depends = ["setup"]
+run = "python -m src.main"
+
+[tasks.docker-build]
+description = "Build container image locally"
+run = "docker build -t pinger-mqtt:local ."
+
+[tasks.docker-up]
+description = "Start via Docker Compose (detached)"
+run = "docker compose up --build -d"
+
+[tasks.docker-down]
+description = "Stop Docker Compose stack"
+run = "docker compose down"
+
+[tasks.docker-logs]
+description = "Follow Docker Compose logs"
+run = "docker compose logs -f"
